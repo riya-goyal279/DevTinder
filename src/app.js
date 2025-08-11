@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const user = require("./models/user");
 
 const app = express();
 const port = 3000;
@@ -41,6 +42,25 @@ app.get("/feed", async(req, res) => {
         res.send(400).send("Error getting the user: " + err.message);
     }
 });
+
+app.patch("/user/:userId", async (req, res) => {
+    const userId = req.params?.userId;
+    const newData = req.body;
+
+
+    try {
+        const ALLOWED_UPDATES = ["imageUrl", "about", "gender", "age", "skills"];
+
+        const isUpdateAllowed = Object.keys(newData).every((k) => ALLOWED_UPDATES.includes(k));
+        if(!isUpdateAllowed) 
+            res.status(400).send("Update not allowed");
+
+        await User.findByIdAndUpdate({_id: userId}, newData, { runValidators: true });
+        res.send("User updated successfully");
+    } catch(err) {
+        res.status(400).send("Error getting the user: " + err.message);
+    }
+})
 
 connectDB()
     .then(() => {

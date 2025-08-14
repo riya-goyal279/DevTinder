@@ -58,12 +58,12 @@ app.get("/user", async(req, res) => {
     try{
         const users = await User.find({emailId: userEmail});
         if(users.length === 0){
-            res.send(404).send("User not found");
+            res.status(404).send("User not found");
         } else {
             res.send(users);
         }
     }catch(err) {
-        res.send(400).send("Error getting the user: " + err.message);
+        res.status(400).send("Error getting the user: " + err.message);
     }
 });
 
@@ -72,7 +72,7 @@ app.get("/feed", async(req, res) => {
         const users = await User.find({});
         res.send(users);
     } catch(err) {
-        res.send(400).send("Error getting the user: " + err.message);
+        res.status(400).send("Error getting the user: " + err.message);
     }
 });
 

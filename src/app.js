@@ -3,11 +3,15 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
     
@@ -42,13 +46,26 @@ app.post("/login", async (req, res) => {
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        if(isPasswordValid)
+        if(isPasswordValid){
+            const token = await jwt.sign({_id: user._id}, "DEV@Tinder$279");
+            
+            res.cookie("token", token);
             res.send("Login Successful !!!");
+        }
         else 
             throw new Error("Invalid Credentials");
 
     } catch (err) {
         res.status(400).send("Error : " + err.message);
+    }
+});
+
+app.get("/profile", userAuth , async (req, res) => {
+    try{
+        const user = req.user;
+        res.send(user);
+    } catch(err) {
+        res.status(400).send("User not logged in: " + err.message);
     }
 });
 
@@ -79,7 +96,6 @@ app.get("/feed", async(req, res) => {
 app.patch("/user/:userId", async (req, res) => {
     const userId = req.params?.userId;
     const newData = req.body;
-
 
     try {
         const ALLOWED_UPDATES = ["imageUrl", "about", "gender", "age", "skills"];

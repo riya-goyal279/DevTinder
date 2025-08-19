@@ -34,7 +34,7 @@ userRouter.get("/user/connections", userAuth, async(req, res) => {
                     status: "accepted"
                 },
             ]
-        }).populate("fromUserId", USER_SHARABLE_DATA);
+        }).populate("toUserId", USER_SHARABLE_DATA);
 
         const data = connections.map(connection => connection.fromUserId);
         res.json({message: "Data fetched successfully", data});

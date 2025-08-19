@@ -44,7 +44,7 @@ requestsRouter.post("/request/send/:status/:toUserId", userAuth, async(req, res)
     }
 });
 
-requestsRouter.post("/request/send/:status/:requestId", userAuth, async(req, res) => {
+requestsRouter.post("/request/review/:status/:requestId", userAuth, async(req, res) => {
     try {
         const loggedInUser = req.user;
         const {status, requestId} = req.params;
